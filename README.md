@@ -1,4 +1,4 @@
-# 📍 Lost & Found System v2.0
+# 📍 Lost & Found System
 
 A full-stack web application built for the **Web Engineering Lab** course. Users can report lost items, post found items, view item details with contact info, and receive smart match suggestions based on category.
 
