@@ -1,0 +1,27 @@
+<%- include('partials/header', { title: 'Sign In' }) %>
+<div class="auth-wrap">
+  <div class="auth-panel">
+    <div class="auth-head">
+      <i data-lucide="log-in" class="auth-head-icon"></i>
+      <h1>Welcome back</h1>
+      <p>Sign in to manage your lost &amp; found items</p>
+    </div>
+    <% if (registered) { %><div class="alert alert--success"><i data-lucide="check-circle" class="icon-sm"></i> Account created. You can now sign in.</div><% } %>
+    <% if (error) { %><div class="alert alert--error"><i data-lucide="alert-circle" class="icon-sm"></i> <%= error %></div><% } %>
+    <form id="loginForm" action="/login" method="POST" novalidate>
+      <div class="form-field">
+        <label for="email">Email address</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" />
+        <span class="field-err" id="emailError"></span>
+      </div>
+      <div class="form-field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Enter your password" />
+        <span class="field-err" id="passwordError"></span>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Sign In</button>
+    </form>
+    <p class="auth-switch">Don't have an account? <a href="/register">Register</a></p>
+  </div>
+</div>
+<%- include('partials/footer') %>

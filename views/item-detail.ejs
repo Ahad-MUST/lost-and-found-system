@@ -1,0 +1,124 @@
+<%- include('partials/header', { title: item.ItemName }) %>
+<div class="page-wrap">
+  <a href="/" class="back-link"><i data-lucide="arrow-left" class="icon-sm"></i> Back to Browse</a>
+
+  <div class="detail-grid">
+    <div class="detail-main">
+      <div class="detail-card">
+        <div class="detail-card-header">
+          <div class="detail-badges">
+            <% if (type === 'lost') { %>
+              <span class="card-badge card-badge--lost">Lost</span>
+            <% } else { %>
+              <span class="card-badge card-badge--found">Found</span>
+            <% } %>
+            <span class="status-tag status-<%= item.Status.toLowerCase() %>"><%= item.Status %></span>
+          </div>
+          <span class="detail-id">#<%= item.ItemID %></span>
+        </div>
+
+        <h1 class="detail-title"><%= item.ItemName %></h1>
+
+        <div class="detail-chips">
+          <div class="chip"><i data-lucide="tag" class="icon-xs"></i> <%= item.Category %></div>
+          <% if (type === 'lost') { %>
+            <div class="chip"><i data-lucide="calendar" class="icon-xs"></i> Lost <%= new Date(item.DateLost).toLocaleDateString('en-PK', {year:'numeric',month:'long',day:'numeric'}) %></div>
+            <div class="chip"><i data-lucide="map-pin" class="icon-xs"></i> <%= item.LocationLost %></div>
+          <% } else { %>
+            <div class="chip"><i data-lucide="calendar" class="icon-xs"></i> Found <%= new Date(item.DateFound).toLocaleDateString('en-PK', {year:'numeric',month:'long',day:'numeric'}) %></div>
+            <div class="chip"><i data-lucide="map-pin" class="icon-xs"></i> <%= item.LocationFound %></div>
+          <% } %>
+          <div class="chip"><i data-lucide="clock" class="icon-xs"></i> Posted <%= new Date(item.CreatedAt).toLocaleDateString('en-PK') %></div>
+        </div>
+
+        <div class="detail-section">
+          <h3 class="detail-section-label">Description</h3>
+          <p class="detail-desc"><%= item.Description %></p>
+        </div>
+
+        <div class="detail-section">
+          <h3 class="detail-section-label">Posted by</h3>
+          <div class="reporter-row">
+            <div class="reporter-av"><%= item.ReporterName.charAt(0).toUpperCase() %></div>
+            <div class="reporter-info">
+              <strong><%= item.ReporterName %></strong>
+              <% if (user) { %>
+                <a href="mailto:<%= item.ReporterEmail %>" class="contact-row">
+                  <i data-lucide="mail" class="icon-xs"></i> <%= item.ReporterEmail %>
+                </a>
+                <% if (item.ReporterPhone) { %>
+                  <a href="tel:<%= item.ReporterPhone %>" class="contact-row">
+                    <i data-lucide="phone" class="icon-xs"></i> <%= item.ReporterPhone %>
+                  </a>
+                <% } %>
+              <% } else { %>
+                <span class="contact-gated"><a href="/login">Sign in</a> to view contact details</span>
+              <% } %>
+            </div>
+          </div>
+        </div>
+
+        <% if (user && user.UserID === item.UserID) { %>
+          <div class="detail-owner-bar">
+            <a href="/<%= type === 'lost' ? 'lost-items' : 'found-items' %>/<%= item.ItemID %>/edit" class="btn btn-ghost btn-sm">
+              <i data-lucide="pencil" class="icon-xs"></i> Edit
+            </a>
+            <% if (type === 'lost' && item.Status === 'Active') { %>
+              <form action="/lost-items/<%= item.ItemID %>/recover" method="POST" style="display:inline">
+                <button class="btn btn-primary btn-sm" onclick="return confirm('Mark as recovered?')">
+                  <i data-lucide="check" class="icon-xs"></i> Mark Recovered
+                </button>
+              </form>
+            <% } %>
+            <% if (type === 'found' && item.Status === 'Active') { %>
+              <form action="/found-items/<%= item.ItemID %>/claim" method="POST" style="display:inline">
+                <button class="btn btn-primary btn-sm" onclick="return confirm('Mark as claimed?')">
+                  <i data-lucide="check" class="icon-xs"></i> Mark Claimed
+                </button>
+              </form>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <aside class="detail-sidebar">
+      <div class="match-panel">
+        <div class="match-panel-head">
+          <i data-lucide="<%= type === 'lost' ? 'package-check' : 'package-x' %>" class="icon-sm"></i>
+          <div>
+            <h3>Possible Matches</h3>
+            <p><%= item.Category %> items from the <%= type === 'lost' ? 'found' : 'lost' %> list</p>
+          </div>
+        </div>
+        <% if (matches.length === 0) { %>
+          <div class="match-empty">
+            <i data-lucide="inbox" class="match-empty-icon"></i>
+            <p>No matching items found yet.</p>
+          </div>
+        <% } else { %>
+          <div class="match-list">
+            <% matches.forEach(m => { %>
+              <a href="/<%= type === 'lost' ? 'found-items' : 'lost-items' %>/<%= m.ItemID %>" class="match-row">
+                <div class="match-row-top">
+                  <strong><%= m.ItemName %></strong>
+                </div>
+                <p class="match-row-desc"><%= m.Description.substring(0,65) %>...</p>
+                <div class="match-row-meta">
+                  <% if (type === 'lost') { %>
+                    <span><i data-lucide="map-pin" class="icon-xs"></i><%= m.LocationFound %></span>
+                    <span><i data-lucide="calendar" class="icon-xs"></i><%= new Date(m.DateFound).toLocaleDateString('en-PK') %></span>
+                  <% } else { %>
+                    <span><i data-lucide="map-pin" class="icon-xs"></i><%= m.LocationLost %></span>
+                    <span><i data-lucide="calendar" class="icon-xs"></i><%= new Date(m.DateLost).toLocaleDateString('en-PK') %></span>
+                  <% } %>
+                </div>
+              </a>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    </aside>
+  </div>
+</div>
+<%- include('partials/footer') %>

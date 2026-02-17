@@ -1,0 +1,147 @@
+<%- include('partials/header', { title: 'Admin' }) %>
+<div class="page-wrap">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Admin Panel</h1>
+      <p class="page-sub">System overview and full management controls.</p>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <i data-lucide="package-x" class="kpi-icon"></i>
+      <div><div class="kpi-num"><%= stats.totalLost %></div><div class="kpi-label">Total Lost</div></div>
+    </div>
+    <div class="kpi-card">
+      <i data-lucide="package-check" class="kpi-icon kpi-icon--green"></i>
+      <div><div class="kpi-num"><%= stats.totalFound %></div><div class="kpi-label">Total Found</div></div>
+    </div>
+    <div class="kpi-card">
+      <i data-lucide="check-circle" class="kpi-icon kpi-icon--blue"></i>
+      <div><div class="kpi-num"><%= stats.totalRecovered %></div><div class="kpi-label">Recovered</div></div>
+    </div>
+    <div class="kpi-card">
+      <i data-lucide="archive" class="kpi-icon kpi-icon--teal"></i>
+      <div><div class="kpi-num"><%= stats.totalClaimed %></div><div class="kpi-label">Claimed</div></div>
+    </div>
+    <div class="kpi-card">
+      <i data-lucide="users" class="kpi-icon kpi-icon--amber"></i>
+      <div><div class="kpi-num"><%= stats.totalUsers %></div><div class="kpi-label">Users</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2 class="panel-title"><i data-lucide="package-x" class="icon-sm"></i> All Lost Items <span class="panel-count"><%= lostItems.length %></span></h2>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>#</th><th>Item</th><th>Category</th><th>Reported By</th><th>Date</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% if (!lostItems.length) { %><tr><td colspan="8" class="text-center text-muted">No items.</td></tr><% } %>
+          <% lostItems.forEach(item => { %>
+            <tr>
+              <td class="text-muted text-sm"><%= item.ItemID %></td>
+              <td><a href="/lost-items/<%= item.ItemID %>" class="table-link"><%= item.ItemName %></a></td>
+              <td><span class="cat-tag"><%= item.Category %></span></td>
+              <td class="text-muted"><%= item.ReporterName %></td>
+              <td class="text-muted text-sm"><%= new Date(item.DateLost).toLocaleDateString('en-PK') %></td>
+              <td class="text-muted text-sm"><%= item.LocationLost %></td>
+              <td><span class="status-tag status-<%= item.Status.toLowerCase() %>"><%= item.Status %></span></td>
+              <td>
+                <div class="row-actions">
+                  <form action="/admin/lost/<%= item.ItemID %>/toggle" method="POST">
+                    <button class="act-btn act-btn--green" title="<%= item.Status==='Active'?'Mark Recovered':'Reopen' %>">
+                      <i data-lucide="<%= item.Status==='Active' ? 'check' : 'rotate-ccw' %>" class="icon-xs"></i>
+                    </button>
+                  </form>
+                  <form action="/lost-items/<%= item.ItemID %>/delete" method="POST">
+                    <button class="act-btn act-btn--red" onclick="return confirm('Delete?')" title="Delete">
+                      <i data-lucide="trash-2" class="icon-xs"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2 class="panel-title"><i data-lucide="package-check" class="icon-sm"></i> All Found Items <span class="panel-count"><%= foundItems.length %></span></h2>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>#</th><th>Item</th><th>Category</th><th>Posted By</th><th>Date</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% if (!foundItems.length) { %><tr><td colspan="8" class="text-center text-muted">No items.</td></tr><% } %>
+          <% foundItems.forEach(item => { %>
+            <tr>
+              <td class="text-muted text-sm"><%= item.ItemID %></td>
+              <td><a href="/found-items/<%= item.ItemID %>" class="table-link"><%= item.ItemName %></a></td>
+              <td><span class="cat-tag"><%= item.Category %></span></td>
+              <td class="text-muted"><%= item.ReporterName %></td>
+              <td class="text-muted text-sm"><%= new Date(item.DateFound).toLocaleDateString('en-PK') %></td>
+              <td class="text-muted text-sm"><%= item.LocationFound %></td>
+              <td><span class="status-tag status-<%= item.Status.toLowerCase() %>"><%= item.Status %></span></td>
+              <td>
+                <div class="row-actions">
+                  <form action="/admin/found/<%= item.ItemID %>/toggle" method="POST">
+                    <button class="act-btn act-btn--green" title="<%= item.Status==='Active'?'Mark Claimed':'Reopen' %>">
+                      <i data-lucide="<%= item.Status==='Active' ? 'check' : 'rotate-ccw' %>" class="icon-xs"></i>
+                    </button>
+                  </form>
+                  <form action="/found-items/<%= item.ItemID %>/delete" method="POST">
+                    <button class="act-btn act-btn--red" onclick="return confirm('Delete?')" title="Delete">
+                      <i data-lucide="trash-2" class="icon-xs"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2 class="panel-title"><i data-lucide="users" class="icon-sm"></i> Users <span class="panel-count"><%= users.length %></span></h2>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Lost</th><th>Found</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% users.forEach(u => { %>
+            <tr>
+              <td class="text-muted text-sm"><%= u.UserID %></td>
+              <td><strong><%= u.Name %></strong></td>
+              <td class="text-muted text-sm"><%= u.Email %></td>
+              <td class="text-muted text-sm"><%= u.Phone || '—' %></td>
+              <td><span class="status-tag status-<%= u.Role.toLowerCase() %>"><%= u.Role %></span></td>
+              <td class="text-muted"><%= u.lostCount %></td>
+              <td class="text-muted"><%= u.foundCount %></td>
+              <td class="text-muted text-sm"><%= new Date(u.CreatedAt).toLocaleDateString('en-PK') %></td>
+              <td>
+                <% if (u.Role !== 'Admin') { %>
+                  <form action="/admin/users/<%= u.UserID %>/delete" method="POST">
+                    <button class="act-btn act-btn--red" onclick="return confirm('Delete user and all their data?')" title="Delete user">
+                      <i data-lucide="trash-2" class="icon-xs"></i>
+                    </button>
+                  </form>
+                <% } else { %>
+                  <span class="text-muted">—</span>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<%- include('partials/footer') %>

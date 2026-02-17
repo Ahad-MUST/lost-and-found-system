@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= typeof title !== 'undefined' ? title + ' — Lost & Found' : 'Lost & Found System' %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="/" class="nav-brand">
+    <i data-lucide="map-pin" class="brand-icon"></i>
+    <span>Lost<span class="brand-and">&</span>Found</span>
+  </a>
+  <div class="nav-center">
+    <a href="/" class="nav-link">Browse</a>
+    <% if (user) { %>
+      <a href="/dashboard" class="nav-link">My Items</a>
+      <a href="/profile"   class="nav-link">Profile</a>
+      <% if (user.Role === 'Admin') { %>
+        <a href="/admin" class="nav-link nav-link--admin">Admin</a>
+      <% } %>
+    <% } %>
+  </div>
+  <div class="nav-right">
+    <% if (user) { %>
+      <a href="/lost-items/new"  class="btn btn-sm btn-ghost">
+        <i data-lucide="plus" class="icon-xs"></i> Report Lost
+      </a>
+      <a href="/found-items/new" class="btn btn-sm btn-primary">
+        <i data-lucide="plus" class="icon-xs"></i> Post Found
+      </a>
+      <div class="nav-user">
+        <div class="user-avatar"><%= user.Name.charAt(0).toUpperCase() %></div>
+        <span class="user-name"><%= user.Name %></span>
+        <a href="/logout" class="logout-btn" title="Logout">
+          <i data-lucide="log-out" class="icon-sm"></i>
+        </a>
+      </div>
+    <% } else { %>
+      <a href="/login"    class="btn btn-sm btn-ghost">Sign In</a>
+      <a href="/register" class="btn btn-sm btn-primary">Register</a>
+    <% } %>
+  </div>
+</nav>
+
+<% if (flash) { %>
+  <div class="flash flash--<%= flash.type %>">
+    <i data-lucide="<%= flash.type === 'success' ? 'check-circle' : 'alert-circle' %>" class="icon-sm"></i>
+    <span><%= flash.msg %></span>
+  </div>
+<% } %>
+
+<main class="page-main">

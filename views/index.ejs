@@ -1,0 +1,192 @@
+<%- include('partials/header', { title: 'Browse Items' }) %>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Community Lost &amp; Found Platform</p>
+    <h1 class="hero-title">Reuniting people<br/><em>with their belongings.</em></h1>
+    <p class="hero-sub">Report lost items, post what you've found, and help your community reconnect with their belongings.</p>
+    <% if (!user) { %>
+      <div class="hero-actions">
+        <a href="/register" class="btn btn-primary btn-lg">Get Started</a>
+        <a href="#browse"   class="btn btn-outline-light btn-lg">Browse Items</a>
+      </div>
+    <% } else { %>
+      <div class="hero-actions">
+        <a href="/lost-items/new"  class="btn btn-outline-light btn-lg">
+          <i data-lucide="package-x" class="icon-sm"></i> Report Lost Item
+        </a>
+        <a href="/found-items/new" class="btn btn-primary btn-lg">
+          <i data-lucide="package-check" class="icon-sm"></i> Post Found Item
+        </a>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<!-- Stats Bar -->
+<div class="stats-bar">
+  <div class="stats-bar-inner">
+    <div class="stat-bar-item">
+      <span class="stat-bar-num"><%= stats.totalLost %></span>
+      <span class="stat-bar-label">Lost Reports</span>
+    </div>
+    <div class="stat-bar-divider"></div>
+    <div class="stat-bar-item">
+      <span class="stat-bar-num"><%= stats.totalFound %></span>
+      <span class="stat-bar-label">Found Posts</span>
+    </div>
+    <div class="stat-bar-divider"></div>
+    <div class="stat-bar-item">
+      <span class="stat-bar-num"><%= stats.totalRecovered %></span>
+      <span class="stat-bar-label">Recovered</span>
+    </div>
+    <div class="stat-bar-divider"></div>
+    <div class="stat-bar-item">
+      <span class="stat-bar-num"><%= stats.totalUsers %></span>
+      <span class="stat-bar-label">Users</span>
+    </div>
+  </div>
+</div>
+
+<!-- Browse -->
+<section class="browse-section" id="browse">
+  <div class="container">
+
+    <form action="/" method="GET" class="filter-bar" id="filterForm">
+      <input type="hidden" name="tab" value="<%= tab %>" id="tabInput" />
+      <div class="filter-search-wrap">
+        <i data-lucide="search" class="filter-icon"></i>
+        <input type="text" name="search" placeholder="Search by name, description, location..." value="<%= search %>" class="filter-search" />
+      </div>
+      <select name="category" class="filter-select">
+        <option value="">All Categories</option>
+        <% ['Electronics','Documents','Accessories','Books','Keys','Wallet','Bag','Other'].forEach(cat => { %>
+          <option value="<%= cat %>" <%= category === cat ? 'selected' : '' %>><%= cat %></option>
+        <% }) %>
+      </select>
+      <div class="filter-dates">
+        <input type="date" name="dateFrom" value="<%= dateFrom %>" class="filter-date" title="From" />
+        <span class="filter-date-sep">—</span>
+        <input type="date" name="dateTo"   value="<%= dateTo %>"   class="filter-date" title="To" />
+      </div>
+      <button type="submit" class="btn btn-primary btn-sm">
+        <i data-lucide="sliders-horizontal" class="icon-xs"></i> Filter
+      </button>
+      <% if (search || category || dateFrom || dateTo) { %>
+        <a href="/?tab=<%= tab %>" class="btn btn-ghost btn-sm">Clear</a>
+      <% } %>
+    </form>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab <%= tab === 'lost' ? 'active' : '' %>" data-tab="lost">
+        <i data-lucide="package-x" class="icon-sm"></i>
+        Lost Items
+        <span class="tab-badge"><%= lostCount %></span>
+      </button>
+      <button class="tab <%= tab === 'found' ? 'active' : '' %>" data-tab="found">
+        <i data-lucide="package-check" class="icon-sm"></i>
+        Found Items
+        <span class="tab-badge"><%= foundCount %></span>
+      </button>
+    </div>
+
+    <!-- Lost Panel -->
+    <div class="tab-panel <%= tab === 'lost' ? 'active' : '' %>" id="tab-lost">
+      <% if (lostItems.length === 0) { %>
+        <div class="empty-state">
+          <i data-lucide="search-x" class="empty-icon-svg"></i>
+          <p class="empty-title">No active lost items</p>
+          <p class="empty-sub"><% if (search || category || dateFrom || dateTo) { %>Try adjusting your filters.<% } else { %>Nothing has been reported lost yet.<% } %></p>
+        </div>
+      <% } else { %>
+        <div class="cards-grid">
+          <% lostItems.forEach(item => { %>
+            <a href="/lost-items/<%= item.ItemID %>" class="item-card item-card--lost">
+              <div class="card-top">
+                <span class="card-badge card-badge--lost">Lost</span>
+                <span class="card-cat"><%= item.Category %></span>
+              </div>
+              <h3 class="card-title"><%= item.ItemName %></h3>
+              <p class="card-desc"><%= item.Description.substring(0, 90) %><%= item.Description.length > 90 ? '…' : '' %></p>
+              <div class="card-meta">
+                <span><i data-lucide="calendar" class="icon-xs"></i><%= new Date(item.DateLost).toLocaleDateString('en-PK') %></span>
+                <span><i data-lucide="map-pin" class="icon-xs"></i><%= item.LocationLost %></span>
+                <span><i data-lucide="user" class="icon-xs"></i><%= item.ReporterName %></span>
+              </div>
+              <div class="card-cta">View Details <i data-lucide="arrow-right" class="icon-xs"></i></div>
+            </a>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Found Panel -->
+    <div class="tab-panel <%= tab === 'found' ? 'active' : '' %>" id="tab-found">
+      <% if (foundItems.length === 0) { %>
+        <div class="empty-state">
+          <i data-lucide="inbox" class="empty-icon-svg"></i>
+          <p class="empty-title">No active found items</p>
+          <p class="empty-sub"><% if (search || category || dateFrom || dateTo) { %>Try adjusting your filters.<% } else { %>Nothing has been posted as found yet.<% } %></p>
+        </div>
+      <% } else { %>
+        <div class="cards-grid">
+          <% foundItems.forEach(item => { %>
+            <a href="/found-items/<%= item.ItemID %>" class="item-card item-card--found">
+              <div class="card-top">
+                <span class="card-badge card-badge--found">Found</span>
+                <span class="card-cat"><%= item.Category %></span>
+              </div>
+              <h3 class="card-title"><%= item.ItemName %></h3>
+              <p class="card-desc"><%= item.Description.substring(0, 90) %><%= item.Description.length > 90 ? '…' : '' %></p>
+              <div class="card-meta">
+                <span><i data-lucide="calendar" class="icon-xs"></i><%= new Date(item.DateFound).toLocaleDateString('en-PK') %></span>
+                <span><i data-lucide="map-pin" class="icon-xs"></i><%= item.LocationFound %></span>
+                <span><i data-lucide="user" class="icon-xs"></i><%= item.ReporterName %></span>
+              </div>
+              <div class="card-cta">View Details <i data-lucide="arrow-right" class="icon-xs"></i></div>
+            </a>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+
+    <!-- Pagination -->
+    <% if (totalPages > 1) { %>
+      <nav class="pagination">
+        <% if (page > 1) { %>
+          <a href="?tab=<%= tab %>&page=<%= page-1 %>&search=<%= search %>&category=<%= category %>&dateFrom=<%= dateFrom %>&dateTo=<%= dateTo %>" class="page-btn">
+            <i data-lucide="chevron-left" class="icon-xs"></i>
+          </a>
+        <% } %>
+        <% for (let p = 1; p <= totalPages; p++) { %>
+          <a href="?tab=<%= tab %>&page=<%= p %>&search=<%= search %>&category=<%= category %>&dateFrom=<%= dateFrom %>&dateTo=<%= dateTo %>"
+             class="page-btn <%= p === page ? 'active' : '' %>"><%= p %></a>
+        <% } %>
+        <% if (page < totalPages) { %>
+          <a href="?tab=<%= tab %>&page=<%= page+1 %>&search=<%= search %>&category=<%= category %>&dateFrom=<%= dateFrom %>&dateTo=<%= dateTo %>" class="page-btn">
+            <i data-lucide="chevron-right" class="icon-xs"></i>
+          </a>
+        <% } %>
+      </nav>
+    <% } %>
+
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const t = tab.dataset.tab;
+      document.getElementById('tabInput').value = t;
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(x => x.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + t).classList.add('active');
+    });
+  });
+</script>
+
+<%- include('partials/footer') %>

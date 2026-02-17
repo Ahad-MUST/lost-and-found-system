@@ -1,0 +1,93 @@
+<%- include('partials/header', { title: 'Profile' }) %>
+<div class="page-wrap">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Profile</h1>
+      <p class="page-sub">Manage your account information and security.</p>
+    </div>
+    <a href="/dashboard" class="btn btn-ghost"><i data-lucide="arrow-left" class="icon-xs"></i> Dashboard</a>
+  </div>
+
+  <% if (error) { %><div class="alert alert--error"><i data-lucide="alert-circle" class="icon-sm"></i> <%= error %></div><% } %>
+
+  <div class="profile-grid">
+    <div class="profile-sidebar">
+      <div class="profile-id-card">
+        <div class="profile-avatar"><%= profile.Name.charAt(0).toUpperCase() %></div>
+        <h2 class="profile-name"><%= profile.Name %></h2>
+        <p class="profile-email"><%= profile.Email %></p>
+        <span class="status-tag status-<%= profile.Role.toLowerCase() %>"><%= profile.Role %></span>
+        <p class="profile-since">Member since <%= new Date(profile.CreatedAt).toLocaleDateString('en-PK', {year:'numeric',month:'long'}) %></p>
+      </div>
+      <div class="profile-stats-card">
+        <div class="profile-stat">
+          <span><i data-lucide="package-x" class="icon-xs"></i> Lost Reports</span>
+          <strong><%= stats.lostCount %></strong>
+        </div>
+        <div class="profile-stat">
+          <span><i data-lucide="package-check" class="icon-xs"></i> Found Posts</span>
+          <strong><%= stats.foundCount %></strong>
+        </div>
+        <div class="profile-stat">
+          <span><i data-lucide="check-circle" class="icon-xs"></i> Recovered</span>
+          <strong class="text-green"><%= stats.recoveredCount %></strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-forms">
+      <div class="panel">
+        <div class="panel-head"><h2 class="panel-title"><i data-lucide="user" class="icon-sm"></i> Edit Profile</h2></div>
+        <div class="panel-body">
+          <form id="profileForm" action="/profile/update" method="POST" novalidate>
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="name">Full name <span class="req">*</span></label>
+                <input type="text" id="name" name="name" value="<%= profile.Name %>" />
+                <span class="field-err" id="nameError"></span>
+              </div>
+              <div class="form-field">
+                <label>Email address</label>
+                <input type="email" value="<%= profile.Email %>" disabled class="input-disabled" />
+                <small>Email cannot be changed.</small>
+              </div>
+              <div class="form-field">
+                <label for="phone">Phone number</label>
+                <input type="text" id="phone" name="phone" value="<%= profile.Phone || '' %>" placeholder="e.g. 03001234567" />
+                <span class="field-err" id="phoneError"></span>
+              </div>
+            </div>
+            <div class="form-footer"><button type="submit" class="btn btn-primary">Save Changes</button></div>
+          </form>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2 class="panel-title"><i data-lucide="lock" class="icon-sm"></i> Change Password</h2></div>
+        <div class="panel-body">
+          <form id="passwordForm" action="/profile/change-password" method="POST" novalidate>
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="currentPassword">Current password <span class="req">*</span></label>
+                <input type="password" id="currentPassword" name="currentPassword" placeholder="Enter current password" />
+                <span class="field-err" id="currentPasswordError"></span>
+              </div>
+              <div class="form-field">
+                <label for="newPassword">New password <span class="req">*</span></label>
+                <input type="password" id="newPassword" name="newPassword" placeholder="At least 6 characters" />
+                <span class="field-err" id="newPasswordError"></span>
+              </div>
+              <div class="form-field">
+                <label for="confirmPassword">Confirm new password <span class="req">*</span></label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repeat new password" />
+                <span class="field-err" id="confirmPasswordError"></span>
+              </div>
+            </div>
+            <div class="form-footer"><button type="submit" class="btn btn-primary">Change Password</button></div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('partials/footer') %>

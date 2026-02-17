@@ -1,0 +1,51 @@
+<%- include('partials/header', { title: item ? 'Edit Post' : 'Post Found Item' }) %>
+<div class="page-wrap">
+  <div class="form-page">
+    <div class="form-page-head">
+      <i data-lucide="package-check" class="form-page-icon"></i>
+      <div>
+        <h1><%= item ? 'Edit Found Item' : 'Post Found Item' %></h1>
+        <p>Help someone get their belongings back.</p>
+      </div>
+    </div>
+    <% if (error) { %><div class="alert alert--error"><i data-lucide="alert-circle" class="icon-sm"></i> <%= error %></div><% } %>
+    <form id="foundItemForm" action="<%= item ? '/found-items/'+item.ItemID+'/update' : '/found-items' %>" method="POST" novalidate>
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="itemName">Item name <span class="req">*</span></label>
+          <input type="text" id="itemName" name="itemName" placeholder="e.g. Student ID Card, Blue Umbrella" value="<%= item ? item.ItemName : '' %>" />
+          <span class="field-err" id="itemNameError"></span>
+        </div>
+        <div class="form-field">
+          <label for="category">Category <span class="req">*</span></label>
+          <select id="category" name="category">
+            <option value="">Select category</option>
+            <% categories.forEach(cat => { %><option value="<%= cat %>" <%= item && item.Category===cat ? 'selected':'' %>><%= cat %></option><% }) %>
+          </select>
+          <span class="field-err" id="categoryError"></span>
+        </div>
+        <div class="form-field">
+          <label for="dateFound">Date found <span class="req">*</span></label>
+          <input type="date" id="dateFound" name="dateFound" max="<%= new Date().toISOString().split('T')[0] %>"
+            value="<%= item ? new Date(item.DateFound).toISOString().split('T')[0] : '' %>" />
+          <span class="field-err" id="dateFoundError"></span>
+        </div>
+        <div class="form-field">
+          <label for="locationFound">Location found <span class="req">*</span></label>
+          <input type="text" id="locationFound" name="locationFound" placeholder="e.g. Library Block A, Parking Area" value="<%= item ? item.LocationFound : '' %>" />
+          <span class="field-err" id="locationFoundError"></span>
+        </div>
+        <div class="form-field form-field--full">
+          <label for="description">Description <span class="req">*</span></label>
+          <textarea id="description" name="description" rows="4" placeholder="Describe the item: color, condition, any visible marks, text, or features."><%= item ? item.Description : '' %></textarea>
+          <span class="field-err" id="descriptionError"></span>
+        </div>
+      </div>
+      <div class="form-footer">
+        <a href="/dashboard" class="btn btn-ghost">Cancel</a>
+        <button type="submit" class="btn btn-primary"><%= item ? 'Update Post' : 'Submit Post' %></button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('partials/footer') %>

@@ -1,0 +1,51 @@
+<%- include('partials/header', { title: item ? 'Edit Report' : 'Report Lost Item' }) %>
+<div class="page-wrap">
+  <div class="form-page">
+    <div class="form-page-head">
+      <i data-lucide="package-x" class="form-page-icon"></i>
+      <div>
+        <h1><%= item ? 'Edit Lost Item' : 'Report Lost Item' %></h1>
+        <p>Provide details so the community can help you find it.</p>
+      </div>
+    </div>
+    <% if (error) { %><div class="alert alert--error"><i data-lucide="alert-circle" class="icon-sm"></i> <%= error %></div><% } %>
+    <form id="lostItemForm" action="<%= item ? '/lost-items/'+item.ItemID+'/update' : '/lost-items' %>" method="POST" novalidate>
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="itemName">Item name <span class="req">*</span></label>
+          <input type="text" id="itemName" name="itemName" placeholder="e.g. Black Wallet, iPhone 13" value="<%= item ? item.ItemName : '' %>" />
+          <span class="field-err" id="itemNameError"></span>
+        </div>
+        <div class="form-field">
+          <label for="category">Category <span class="req">*</span></label>
+          <select id="category" name="category">
+            <option value="">Select category</option>
+            <% categories.forEach(cat => { %><option value="<%= cat %>" <%= item && item.Category===cat ? 'selected':'' %>><%= cat %></option><% }) %>
+          </select>
+          <span class="field-err" id="categoryError"></span>
+        </div>
+        <div class="form-field">
+          <label for="dateLost">Date lost <span class="req">*</span></label>
+          <input type="date" id="dateLost" name="dateLost" max="<%= new Date().toISOString().split('T')[0] %>"
+            value="<%= item ? new Date(item.DateLost).toISOString().split('T')[0] : '' %>" />
+          <span class="field-err" id="dateLostError"></span>
+        </div>
+        <div class="form-field">
+          <label for="locationLost">Location lost <span class="req">*</span></label>
+          <input type="text" id="locationLost" name="locationLost" placeholder="e.g. MUST Main Campus, City Mall" value="<%= item ? item.LocationLost : '' %>" />
+          <span class="field-err" id="locationLostError"></span>
+        </div>
+        <div class="form-field form-field--full">
+          <label for="description">Description <span class="req">*</span></label>
+          <textarea id="description" name="description" rows="4" placeholder="Describe the item in detail: color, brand, size, identifying features, what was inside, etc."><%= item ? item.Description : '' %></textarea>
+          <span class="field-err" id="descriptionError"></span>
+        </div>
+      </div>
+      <div class="form-footer">
+        <a href="/dashboard" class="btn btn-ghost">Cancel</a>
+        <button type="submit" class="btn btn-primary"><%= item ? 'Update Report' : 'Submit Report' %></button>
+      </div>
+    </form>
+  </div>
+</div>
+<%- include('partials/footer') %>

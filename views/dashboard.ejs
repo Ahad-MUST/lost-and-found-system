@@ -1,0 +1,126 @@
+<%- include('partials/header', { title: 'Dashboard' }) %>
+<div class="page-wrap">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-sub">Manage your lost and found reports, <%= user.Name %>.</p>
+    </div>
+    <div class="page-actions">
+      <a href="/lost-items/new"  class="btn btn-ghost"><i data-lucide="plus" class="icon-xs"></i> Report Lost</a>
+      <a href="/found-items/new" class="btn btn-primary"><i data-lucide="plus" class="icon-xs"></i> Post Found</a>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <i data-lucide="package-x" class="kpi-icon"></i>
+      <div><div class="kpi-num"><%= lostItems.length %></div><div class="kpi-label">Lost Reports</div></div>
+    </div>
+    <div class="kpi-card">
+      <i data-lucide="package-check" class="kpi-icon"></i>
+      <div><div class="kpi-num"><%= foundItems.length %></div><div class="kpi-label">Found Posts</div></div>
+    </div>
+    <div class="kpi-card">
+      <i data-lucide="check-circle" class="kpi-icon kpi-icon--green"></i>
+      <div><div class="kpi-num"><%= lostItems.filter(i=>i.Status==='Recovered').length %></div><div class="kpi-label">Recovered</div></div>
+    </div>
+    <div class="kpi-card">
+      <i data-lucide="archive" class="kpi-icon kpi-icon--blue"></i>
+      <div><div class="kpi-num"><%= foundItems.filter(i=>i.Status==='Claimed').length %></div><div class="kpi-label">Claimed</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2 class="panel-title">
+        <i data-lucide="package-x" class="icon-sm"></i> My Lost Item Reports
+        <span class="panel-count"><%= lostItems.length %></span>
+      </h2>
+      <form action="/dashboard" method="GET" class="panel-search">
+        <i data-lucide="search" class="panel-search-icon"></i>
+        <input type="text" name="dsearch" value="<%= dsearch %>" placeholder="Filter your items..." class="panel-search-input" />
+        <% if (dsearch) { %><a href="/dashboard" class="panel-search-clear"><i data-lucide="x" class="icon-xs"></i></a><% } %>
+      </form>
+    </div>
+    <% if (lostItems.length === 0) { %>
+      <div class="panel-empty">
+        <% if (dsearch) { %>No items match "<%= dsearch %>".<% } else { %>No lost items yet. <a href="/lost-items/new">Report one</a>.<% } %>
+      </div>
+    <% } else { %>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Item</th><th>Category</th><th>Date Lost</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <% lostItems.forEach(item => { %>
+              <tr>
+                <td><a href="/lost-items/<%= item.ItemID %>" class="table-link"><%= item.ItemName %></a></td>
+                <td><span class="cat-tag"><%= item.Category %></span></td>
+                <td class="text-muted"><%= new Date(item.DateLost).toLocaleDateString('en-PK') %></td>
+                <td class="text-muted"><%= item.LocationLost %></td>
+                <td><span class="status-tag status-<%= item.Status.toLowerCase() %>"><%= item.Status %></span></td>
+                <td>
+                  <div class="row-actions">
+                    <a href="/lost-items/<%= item.ItemID %>/edit" class="act-btn" title="Edit"><i data-lucide="pencil" class="icon-xs"></i></a>
+                    <% if (item.Status === 'Active') { %>
+                      <form action="/lost-items/<%= item.ItemID %>/recover" method="POST">
+                        <button class="act-btn act-btn--green" title="Mark recovered" onclick="return confirm('Mark as recovered?')"><i data-lucide="check" class="icon-xs"></i></button>
+                      </form>
+                    <% } %>
+                    <form action="/lost-items/<%= item.ItemID %>/delete" method="POST">
+                      <button class="act-btn act-btn--red" title="Delete" onclick="return confirm('Delete this item?')"><i data-lucide="trash-2" class="icon-xs"></i></button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2 class="panel-title">
+        <i data-lucide="package-check" class="icon-sm"></i> My Found Item Posts
+        <span class="panel-count"><%= foundItems.length %></span>
+      </h2>
+    </div>
+    <% if (foundItems.length === 0) { %>
+      <div class="panel-empty">
+        <% if (dsearch) { %>No items match "<%= dsearch %>".<% } else { %>No found items yet. <a href="/found-items/new">Post one</a>.<% } %>
+      </div>
+    <% } else { %>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Item</th><th>Category</th><th>Date Found</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <% foundItems.forEach(item => { %>
+              <tr>
+                <td><a href="/found-items/<%= item.ItemID %>" class="table-link"><%= item.ItemName %></a></td>
+                <td><span class="cat-tag"><%= item.Category %></span></td>
+                <td class="text-muted"><%= new Date(item.DateFound).toLocaleDateString('en-PK') %></td>
+                <td class="text-muted"><%= item.LocationFound %></td>
+                <td><span class="status-tag status-<%= item.Status.toLowerCase() %>"><%= item.Status %></span></td>
+                <td>
+                  <div class="row-actions">
+                    <a href="/found-items/<%= item.ItemID %>/edit" class="act-btn" title="Edit"><i data-lucide="pencil" class="icon-xs"></i></a>
+                    <% if (item.Status === 'Active') { %>
+                      <form action="/found-items/<%= item.ItemID %>/claim" method="POST">
+                        <button class="act-btn act-btn--green" title="Mark claimed" onclick="return confirm('Mark as claimed?')"><i data-lucide="check" class="icon-xs"></i></button>
+                      </form>
+                    <% } %>
+                    <form action="/found-items/<%= item.ItemID %>/delete" method="POST">
+                      <button class="act-btn act-btn--red" title="Delete" onclick="return confirm('Delete this item?')"><i data-lucide="trash-2" class="icon-xs"></i></button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+<%- include('partials/footer') %>
